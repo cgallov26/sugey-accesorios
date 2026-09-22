@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sugey Accesorios & Más - Panel Principal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Configuración de colores corporativos -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#E53E3E', /* Rojo característico */
+                            dark: '#1A202C', /* Negro elegante */
+                            light: '#F7FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light text-brand-dark antialiased">
+
+    <!-- CABECERA -->
+    <header class="bg-brand-dark text-white shadow-lg border-b-4 border-brand-red">
+        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <!-- LOGO REAL -->
+                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-brand-red shadow-md flex-shrink-0">
+                    <img src="image_93adc6.png" alt="Logo Sugey Accesorios & Más" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Sugey Accesorios & Más</h1>
+                    <p class="text-xs text-gray-400">Sistema de Venta Libre y Cuentas</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs bg-brand-red text-white px-3 py-1 rounded-full font-medium shadow-sm">
+                    <i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i> Moneda: Soles (S/)
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="container mx-auto px-4 py-6 max-w-4xl">
+        
+        <!-- PESTAÑAS DE NAVEGACIÓN -->
+        <div class="flex flex-wrap space-x-2 mb-6 border-b border-gray-200 pb-2 gap-y-2">
+            <button onclick="cambiarTab('dashboard')" id="btn-dashboard" class="px-5 py-2.5 bg-brand-red text-white rounded-xl font-semibold text-sm shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> Inicio / Resumen
+            </button>
+            <button onclick="cambiarTab('ventas')" id="btn-ventas" class="px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-cash-register"></i> Registrar Venta
+            </button>
+            <button onclick="cambiarTab('clientes')" id="btn-clientes" class="px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-users"></i> Clientes y Créditos / Fiados
+            </button>
+        </div>
+
+        <!-- SECCIÓN: DASHBOARD (INICIO) -->
+        <section id="tab-dashboard" class="space-y-6">
+            <div class="bg-gradient-to-r from-brand-dark to-gray-800 text-white p-6 rounded-2xl shadow-md">
+                <h2 class="text-lg font-bold mb-1">¡Bienvenida de nuevo, Sugey! 👗</h2>
+                <p class="text-xs text-gray-300">Aquí tienes un vistazo rápido al estado actual de tu negocio.</p>
+            </div>
+
+            <!-- TARJETAS DE MÉTRICAS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-red-50 text-brand-red rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Ventas Totales Registradas</p>
+                        <h3 id="dash-total-ventas" class="text-xl font-bold text-brand-dark">S/ 0.00</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Deuda Total en Fiados</p>
+                        <h3 id="dash-total-deudas" class="text-xl font-bold text-brand-red">S/ 0.00</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-user-group"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase">Clientes Registrados</p>
+                        <h3 id="dash-total-clientes" class="text-xl font-bold text-brand-dark">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCESOS DIRECTOS DESDE EL DASHBOARD -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-brand-dark mb-4">Acciones Rápidas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button onclick="cambiarTab('ventas')" class="p-4 rounded-xl border border-gray-200 hover:border-brand-red hover:bg-red-50 transition text-left flex items-center space-x-3 group">
+                        <div class="w-10 h-10 bg-brand-red text-white rounded-lg flex items-center justify-center shadow">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-brand-dark group-hover:text-brand-red">Registrar una Venta</h4>
+                            <p class="text-xs text-gray-500">Anota prendas o accesorios al vuelo</p>
+                        </div>
+                    </button>
+
+                    <button onclick="cambiarTab('clientes')" class="p-4 rounded-xl border border-gray-200 hover:border-brand-dark hover:bg-gray-50 transition text-left flex items-center space-x-3 group">
+                        <div class="w-10 h-10 bg-brand-dark text-white rounded-lg flex items-center justify-center shadow">
+                            <i class="fa-solid fa-users-rectangle"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-brand-dark">Revisar Cuentas / Fiados</h4>
+                            <p class="text-xs text-gray-500">Ver historiales y registrar abonos</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: NUEVA VENTA LIBRE -->
+        <section id="tab-ventas" class="space-y-4 hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping text-brand-red"></i> Datos de la Venta
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Opcional si es al contado)</label>
+                        <select id="venta-cliente" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                            <option value="">-- Venta al contado (Anónimo) --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipo de Pago</label>
+                        <select id="venta-tipo" onchange="verificarTipoPago()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                            <option value="contado">Contado (Efectivo / Yape / Plin)</option>
+                            <option value="credito">Crédito / Cuenta Abierta (Fiado)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Recargo por fiado opcional -->
+                <div id="seccion-recargo" class="mb-4 bg-amber-50 border border-amber-200 p-4 rounded-xl hidden">
+                    <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-coins mr-1"></i> Recargo por Crédito / Fiado (S/)
+                    </label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" step="0.01" id="venta-recargo" value="0.00" oninput="actualizarVistaCarrito()" class="w-40 border border-amber-300 rounded-xl p-2 text-sm bg-white focus:ring-2 focus:ring-brand-red focus:outline-none font-bold text-brand-red">
+                        <p class="text-xs text-amber-700">Monto extra opcional a sumar al total por la modalidad de pago a plazos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGREGAR PRODUCTO AL VUELO -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold mb-3 text-brand-dark text-sm uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-tag text-brand-red"></i> Escribir Prenda o Accesorio que se lleva
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                    <input type="text" id="item-nombre" placeholder="Nombre (Ej. Blusa elegante)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none md:col-span-1">
+                    <input type="text" id="item-color" placeholder="Color (Ej. Rojo, Negro)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                    <input type="text" id="item-talla" placeholder="Talla (S, M, L o Única)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                    <input type="number" step="0.01" id="item-precio" placeholder="Precio (S/)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                </div>
+
+                <button onclick="agregarItemLibre()" class="w-full bg-brand-dark hover:bg-black text-white py-2.5 rounded-xl font-medium text-sm transition flex items-center justify-center gap-2 shadow">
+                    <i class="fa-solid fa-plus"></i> Agregar Prenda a la Lista
+                </button>
+            </div>
+
+            <!-- RESUMEN DE LA VENTA -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold mb-3 text-brand-dark text-sm uppercase tracking-wider">Productos en esta venta</h3>
+                <div id="carrito-lista" class="divide-y divide-gray-100 mb-4 text-sm">
+                    <p class="text-gray-400 py-3 text-center italic">No hay productos agregados todavía.</p>
+                </div>
+                <div id="resumen-calculos" class="border-t border-gray-200 pt-4 mb-5 space-y-2 text-sm">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal prendas:</span>
+                        <span id="carrito-subtotal">S/ 0.00</span>
+                    </div>
+                    <div id="fila-recargo-resumen" class="flex justify-between text-amber-700 hidden">
+                        <span>Recargo por crédito:</span>
+                        <span id="carrito-recargo-lbl">S/ 0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold pt-2 border-t border-gray-100">
+                        <span class="text-gray-800">Total a Pagar:</span>
+                        <span id="carrito-total" class="text-brand-red text-xl">S/ 0.00</span>
+                    </div>
+                </div>
+                <button onclick="finalizarVenta()" class="w-full bg-brand-red hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i> Completar y Registrar Venta
+                </button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: CLIENTES Y CRÉDITOS -->
+        <section id="tab-clientes" class="space-y-4 hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-brand-red"></i> Registrar Nuevo Cliente
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                    <input type="text" id="cli-nombre" placeholder="Nombre completo" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                    <input type="text" id="cli-telefono" placeholder="Teléfono / WhatsApp" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                    <button onclick="guardarCliente()" class="bg-brand-dark hover:bg-black text-white rounded-xl py-2.5 text-sm font-medium transition shadow">Guardar Cliente</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-base font-bold mb-4 text-brand-dark">Listado de Clientes, Cuentas y Deudas</h2>
+                <div id="lista-clientes-container" class="overflow-x-auto">
+                    <p class="text-gray-400 text-sm py-2">Cargando clientes...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL HISTORIAL DE COMPRAS Y ABONOS -->
+    <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 id="historial-titulo" class="text-lg font-bold text-brand-dark">Historial de Movimientos</h3>
+                <button onclick="cerrarHistorial()" class="text-gray-400 hover:text-brand-red text-lg p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="historial-contenido" class="space-y-3 text-sm">
+                <p class="text-gray-400 italic">Cargando historial...</p>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="cerrarHistorial()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-xl text-sm font-medium transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAJ-0T2nRy7awJ92eKIQKHbnLQVk-fF0U",
+            authDomain: "sugeyaccmas.firebaseapp.com",
+            projectId: "sugeyaccmas",
+            storageBucket: "sugeyaccmas.firebasestorage.app",
+            messagingSenderId: "529106481058",
+            appId: "1:529106481058:web:cc10f0fc429a29ba6f0cfb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let carritoLibre = [];
+
+        window.cambiarTab = function(tab) {
+            ['dashboard', 'ventas', 'clientes'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).className = "px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2";
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            
+            const btnActivo = document.getElementById(`btn-${tab}`);
+            btnActivo.className = "px-5 py-2.5 bg-brand-red text-white rounded-xl font-semibold text-sm shadow-md transition flex items-center gap-2";
+            
+            if(tab === 'dashboard') cargarDashboard();
+            if(tab === 'ventas') cargarSelectClientes();
+            if(tab === 'clientes') cargarClientes();
+        }
+
+        async function cargarDashboard() {
+            try {
+                const ventasSnap = await getDocs(collection(db, "ventas"));
+                let totalVentas = 0;
+                ventasSnap.forEach(d => {
+                    totalVentas += (d.data().total || 0);
+                });
+
+                const clientesSnap = await getDocs(collection(db, "clientes"));
+                let totalDeudas = 0;
+                let totalClientes = 0;
+                clientesSnap.forEach(d => {
+                    totalClientes++;
+                    totalDeudas += (d.data().deudaTotal || 0);
+                });
+
+                document.getElementById('dash-total-ventas').innerText = `S/ ${totalVentas.toFixed(2)}`;
+                document.getElementById('dash-total-deudas').innerText = `S/ ${totalDeudas.toFixed(2)}`;
+                document.getElementById('dash-total-clientes').innerText = totalClientes;
+            } catch(e) {
+                console.error("Error cargando dashboard:", e);
+            }
+        }
+
+        window.verificarTipoPago = function() {
+            const tipo = document.getElementById('venta-tipo').value;
+            const seccionRecargo = document.getElementById('seccion-recargo');
+            const filaRecargoResumen = document.getElementById('fila-recargo-resumen');
+
+            if(tipo === 'credito') {
+                seccionRecargo.classList.remove('hidden');
+                filaRecargoResumen.classList.remove('hidden');
+            } else {
+                seccionRecargo.classList.add('hidden');
+                filaRecargoResumen.classList.add('hidden');
+                document.getElementById('venta-recargo').value = '0.00';
+            }
+            actualizarVistaCarrito();
+        }
+
+        window.agregarItemLibre = function() {
+            const nombre = document.getElementById('item-nombre').value.trim();
+            const color = document.getElementById('item-color').value.trim() || 'Único';
+            const talla = document.getElementById('item-talla').value.trim() || 'Única';
+            const precio = parseFloat(document.getElementById('item-precio').value);
+
+            if(!nombre || isNaN(precio) || precio <= 0) {
+                alert("Por favor ingresa al menos el nombre del producto y un precio válido.");
+                return;
+            }
+
+            carritoLibre.push({ nombre, color, talla, precio });
+            
+            document.getElementById('item-nombre').value = '';
+            document.getElementById('item-color').value = '';
+            document.getElementById('item-talla').value = '';
+            document.getElementById('item-precio').value = '';
+            document.getElementById('item-nombre').focus();
+
+            actualizarVistaCarrito();
+        }
+
+        window.quitarItemCarrito = function(index) {
+            carritoLibre.splice(index, 1);
+            actualizarVistaCarrito();
+        }
+
+        function actualizarVistaCarrito() {
+            const container = document.getElementById('carrito-lista');
+            let subtotal = 0;
+
+            if(carritoLibre.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 py-3 text-center italic">No hay productos agregados todavía.</p>';
+                document.getElementById('carrito-subtotal').innerText = 'S/ 0.00';
+                document.getElementById('carrito-recargo-lbl').innerText = 'S/ 0.00';
+                document.getElementById('carrito-total').innerText = 'S/ 0.00';
+                return;
+            }
+
+            let html = '';
+            carritoLibre.forEach((item, idx) => {
+                subtotal += item.precio;
+                html += `<div class="flex justify-between items-center py-2">
+                    <div>
+                        <span class="font-semibold text-brand-dark">${item.nombre}</span>
+                        <p class="text-xs text-gray-500">Color: ${item.color} | Talla: ${item.talla} — <span class="font-bold text-brand-red">S/ ${item.precio.toFixed(2)}</span></p>
+                    </div>
+                    <button onclick="quitarItemCarrito(${idx})" class="text-gray-400 hover:text-brand-red text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+            container.innerHTML = html;
+
+            const recargo = parseFloat(document.getElementById('venta-recargo').value) || 0;
+            const total = subtotal + recargo;
+
+            document.getElementById('carrito-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
+            document.getElementById('carrito-recargo-lbl').innerText = `S/ ${recargo.toFixed(2)}`;
+            document.getElementById('carrito-total').innerText = `S/ ${total.toFixed(2)}`;
+        }
+
+        window.guardarCliente = async function() {
+            const nombre = document.getElementById('cli-nombre').value.trim();
+            const telefono = document.getElementById('cli-telefono').value.trim();
+
+            if(!nombre) {
+                alert("Escribe el nombre del cliente.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "clientes"), { nombre, telefono, deudaTotal: 0 });
+                alert("¡Cliente registrado con éxito!");
+                document.getElementById('cli-nombre').value = '';
+                document.getElementById('cli-telefono').value = '';
+                cargarClientes();
+            } catch (e) {
+                console.error("Error al guardar cliente: ", e);
+                alert("Error al guardar cliente.");
+            }
+        }
+
+        async function cargarClientes() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "clientes"));
+                let html = `<table class="w-full text-left text-sm"><thead class="border-b bg-gray-50 text-gray-600"><tr><th class="p-3">Cliente</th><th class="p-3">Teléfono</th><th class="p-3">Deuda Pendiente</th><th class="p-3 text-center">Acciones / Historial</th></tr></thead><tbody class="divide-y divide-gray-100">`;
+                
+                if(querySnapshot.empty) {
+                    document.getElementById('lista-clientes-container').innerHTML = '<p class="text-gray-400 text-sm py-3 text-center italic">No hay clientes registrados.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const c = docSnap.data();
+                    const clienteId = docSnap.id;
+                    const deuda = c.deudaTotal || 0;
+                    
+                    let badgeDeuda = `<span class="bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-lg text-xs font-semibold">Al día (S/ 0.00)</span>`;
+                    if(deuda > 0) {
+                        badgeDeuda = `<span class="bg-red-50 text-brand-red border border-red-200 px-2.5 py-1 rounded-lg text-xs font-bold">S/ ${deuda.toFixed(2)} pendiente</span>`;
+                    }
+
+                    html += `<tr>
+                        <td class="p-3 font-semibold text-brand-dark">${c.nombre}</td>
+                        <td class="p-3 text-gray-600">${c.telefono || '-'}</td>
+                        <td class="p-3">${badgeDeuda}</td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick="verHistorialCliente('${clienteId}', '${c.nombre}')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm"><i class="fa-solid fa-clock-rotate-left mr-1 text-brand-red"></i> Historial</button>
+                            ${deuda > 0 ? `<button onclick="registrarAbono('${clienteId}',${deuda})" class="bg-brand-dark hover:bg-black text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm"><i class="fa-solid fa-money-bill-wave mr-1"></i> Abonar</button>` : ''}
+                        </td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+                document.getElementById('lista-clientes-container').innerHTML = html;
+            } catch(e) {
+                console.error("Error cargando clientes:", e);
+            }
+        }
+
+        async function cargarSelectClientes() {
+            try {
+                const cliSnap = await getDocs(collection(db, "clientes"));
+                let cliOptions = '<option value="">-- Venta al contado (Anónimo) --</option>';
+                cliSnap.forEach(d => {
+                    const c = d.data();
+                    cliOptions += `<option value="${d.id}">${c.nombre}</option>`;
+                });
+                document.getElementById('venta-cliente').innerHTML = cliOptions;
+            } catch(e) {
+                console.error("Error cargando clientes en select:", e);
+            }
+        }
+
+        window.verHistorialCliente = async function(clienteId, clienteNombre) {
+            document.getElementById('historial-titulo').innerText = `Historial de Movimientos: ${clienteNombre}`;
+            document.getElementById('historial-contenido').innerHTML = '<p class="text-gray-400 italic py-4 text-center">Buscando compras y abonos...</p>';
+            document.getElementById('modal-historial').classList.remove('hidden');
+
+            try {
+                const qVentas = query(collection(db, "ventas"), where("clienteId", "==", clienteId));
+                const snapVentas = await getDocs(qVentas);
+
+                const qAbonos = query(collection(db, "abonos"), where("clienteId", "==", clienteId));
+                const snapAbonos = await getDocs(qAbonos);
+
+                let movimientos = [];
+
+                snapVentas.forEach(docSnap => {
+                    let v = docSnap.data();
+                    movimientos.push({ tipo: 'venta', fecha: v.fecha, data: v });
+                });
+
+                snapAbonos.forEach(docSnap => {
+                    let a = docSnap.data();
+                    movimientos.push({ tipo: 'abono', fecha: a.fecha, data: a });
+                });
+
+                movimientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+                if(movimientos.length === 0) {
+                    document.getElementById('historial-contenido').innerHTML = '<p class="text-gray-500 py-6 text-center italic">Este cliente aún no registra compras ni abonos.</p>';
+                    return;
+                }
+
+                let html = '<div class="space-y-3">';
+                movimientos.forEach(mov => {
+                    const fechaFormateada = new Date(mov.fecha).toLocaleString();
+
+                    if(mov.tipo === 'venta') {
+                        const v = mov.data;
+                        const tipoBadge = v.tipoPago === 'credito' ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-semibold">Crédito / Fiado</span>' : '<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded font-semibold">Contado</span>';
+                        
+                        html += `<div class="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-2">
+                            <div class="flex justify-between items-center text-xs text-gray-500 border-b pb-1.5">
+                                <span><i class="fa-solid fa-cart-shopping text-brand-red mr-1"><b>COMPRA:</b></i> ${fechaFormateada}</span>
+                                <div class="flex items-center gap-2">
+                                    ${tipoBadge}
+                                    <span class="font-bold text-brand-dark text-sm">Total: S/ ${v.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="text-xs font-semibold text-gray-700 mt-1">Prendas / Artículos:</div>
+                            <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">`;
+                        
+                        v.items.forEach(item => {
+                            html += `<li>${item.nombre} — Color: ${item.color} | Talla: ${item.talla} (S/ ${item.precio.toFixed(2)})</li>`;
+                        });
+
+                        html += `</ul>`;
+                        if(v.recargo && v.recargo > 0) {
+                            html += `<p class="text-[11px] text-amber-700 italic mt-1">Recargo por crédito aplicado: S/ ${v.recargo.toFixed(2)}</p>`;
+                        }
+                        html += `</div>`;
+
+                    } else if(mov.tipo === 'abono') {
+                        const a = mov.data;
+                        html += `<div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center text-xs text-gray-500 border-b border-emerald-100 pb-1.5">
+                                <span><i class="fa-solid fa-money-bill-wave text-emerald-600 mr-1"><b>ABONO PARCIAL:</b></i> ${fechaFormateada}</span>
+                                <span class="font-bold text-emerald-700 text-sm">+ S/ ${a.monto.toFixed(2)}</span>
+                            </div>
+                            <p class="text-xs text-emerald-800 pt-1">El cliente abonó este monto a su cuenta pendiente.</p>
+                        </div>`;
+                    }
+                });
+
+                html += '</div>';
+                document.getElementById('historial-contenido').innerHTML = html;
+            } catch(e) {
+                console.error("Error cargando historial:", e);
+                document.getElementById('historial-contenido').innerHTML = '<p class="text-red-500 py-4 text-center">Error al cargar historial.</p>';
+            }
+        }
+
+        window.cerrarHistorial = function() {
+            document.getElementById('modal-historial').classList.add('hidden');
+        }
+
+        window.registrarAbono = async function(clienteId, deudaActual) {
+            const montoStr = prompt(`Deuda actual: S/ ${deudaActual.toFixed(2)}. Ingrese cuánto está abonando (S/):`);
+            if(!montoStr) return;
+            const abono = parseFloat(montoStr);
+
+            if(isNaN(abono) || abono <= 0) {
+                alert("Ingrese un monto válido.");
+                return;
+            }
+
+            try {
+                const clienteRef = doc(db, "clientes", clienteId);
+                const nuevaDeuda = Math.max(0, deudaActual - abono);
+                await updateDoc(clienteRef, { deudaTotal: nuevaDeuda });
+
+                await addDoc(collection(db, "abonos"), {
+                    clienteId: clienteId,
+                    monto: abono,
+                    fecha: new Date().toISOString()
+                });
+
+                alert(`¡Abono registrado con éxito! Deuda restante: S/ ${nuevaDeuda.toFixed(2)}`);
+                cargarClientes();
+            } catch(e) {
+                console.error("Error al abonar:", e);
+                alert("Error al actualizar la deuda.");
+            }
+        }
+
+        window.finalizarVenta = async function() {
+            if(carritoLibre.length === 0) {
+                alert("Agrega al menos un producto a la venta.");
+                return;
+            }
+
+            const clienteId = document.getElementById('venta-cliente').value;
+            const tipoPago = document.getElementById('venta-tipo').value;
+            const recargo = parseFloat(document.getElementById('venta-recargo').value) || 0;
+
+            if(tipoPago === 'credito' && !clienteId) {
+                alert("Para registrar una venta a crédito / fiado, debes seleccionar obligatoriamente un cliente.");
+                return;
+            }
+
+            let subtotal = carritoLibre.reduce((acc, item) => acc + item.precio, 0);
+            let total = subtotal + recargo;
+
+            try {
+                if(tipoPago === 'credito' && clienteId) {
+                    const clienteRef = doc(db, "clientes", clienteId);
+                    const cliSnap = await getDoc(clienteRef);
+                    if(cliSnap.exists()) {
+                        const deudaActual = cliSnap.data().deudaTotal || 0;
+                        await updateDoc(clienteRef, { deudaTotal: deudaActual + total });
+                    }
+                }
+
+                await addDoc(collection(db, "ventas"), {
+                    clienteId: clienteId || 'anonimo',
+                    tipoPago,
+                    items: carritoLibre,
+                    subtotal,
+                    recargo,
+                    total,
+                    fecha: new Date().toISOString()
+                });
+
+                alert("¡Venta registrada con éxito!");
+                carritoLibre = [];
+                document.getElementById('venta-recargo').value = '0.00';
+                document.getElementById('venta-tipo').value = 'contado';
+                verificarTipoPago();
+                actualizarVistaCarrito();
+                cargarSelectClientes();
+            } catch(e) {
+                console.error("Error al registrar venta:", e);
+                alert("Hubo un error al registrar la venta.");
+            }
+        }
+
+        cargarDashboard();
+    </script>
+</body>
+</html>
