@@ -167,12 +167,23 @@
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Opcional si es al contado)</label>
-                            <select id="venta-cliente" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
-                                <option value="">-- Venta al contado (Anónimo) --</option>
-                            </select>
+                        
+                        <!-- BUSCADOR INTERACTIVO DE CLIENTES (REEMPLAZA AL SELECT ANTIGUO) -->
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Escribe para buscar o déjalo anónimo)</label>
+                            <input type="hidden" id="venta-cliente-id" value="">
+                            <input type="text" id="buscador-cliente" placeholder="🔍 Escribe el nombre del cliente..." oninput="filtrarClientesVenta()" onclick="mostrarListaClientesVenta()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                            
+                            <!-- Lista desplegable flotante de resultados -->
+                            <div id="lista-sugerencias-clientes" class="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden z-20">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                            <div id="cliente-seleccionado-badge" class="mt-1 text-xs text-brand-red font-semibold hidden flex items-center justify-between">
+                                <span>Cliente seleccionado: <strong id="lbl-nombre-seleccionado"></strong></span>
+                                <button onclick="quitarClienteSeleccionado()" class="text-gray-400 hover:text-red-600 underline">Cambiar / Quitar</button>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipo de Pago</label>
                             <select id="venta-tipo" onchange="verificarTipoPago()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
@@ -300,6 +311,7 @@
         let carritoLibre = [];
         let clienteActualModalId = '';
         let clienteActualModalNombre = '';
+        let listaClientesCache = []; // Para búsqueda rápida sin recargar siempre
 
         window.addEventListener('DOMContentLoaded', () => {
             if(sessionStorage.getItem('sugey_sesion_activa') === 'true') {
@@ -345,7 +357,7 @@
             btnActivo.className = "px-5 py-2.5 bg-brand-red text-white rounded-xl font-semibold text-sm shadow-md transition flex items-center gap-2";
             
             if(tab === 'dashboard') cargarDashboard();
-            if(tab === 'ventas') cargarSelectClientes();
+            if(tab === 'ventas') precargarCacheClientes();
             if(tab === 'clientes') cargarClientes();
         }
 
@@ -388,6 +400,79 @@
             }
             actualizarVistaCarrito();
         }
+
+        // --- SISTEMA DE BÚSQUEDA DE CLIENTES MÓVIL ---
+        async function precargarCacheClientes() {
+            try {
+                const cliSnap = await getDocs(collection(db, "clientes"));
+                listaClientesCache = [];
+                cliSnap.forEach(d => {
+                    listaClientesCache.push({ id: d.id, ...d.data() });
+                });
+            } catch(e) {
+                console.error("Error cargando clientes para búsqueda:", e);
+            }
+        }
+
+        window.mostrarListaClientesVenta = function() {
+            renderizarSugerenciasClientes(listaClientesCache);
+        }
+
+        window.filtrarClientesVenta = function() {
+            const texto = document.getElementById('buscador-cliente').value.toLowerCase().trim();
+            if(texto === '') {
+                renderizarSugerenciasClientes(listaClientesCache);
+                return;
+            }
+            const filtrados = listaClientesCache.filter(c => c.nombre.toLowerCase().includes(texto));
+            renderizarSugerenciasClientes(filtrados);
+        }
+
+        function renderizarSugerenciasClientes(clientes) {
+            const contenedor = document.getElementById('lista-sugerencias-clientes');
+            let html = `<div onclick="seleccionarCliente('', 'Venta al contado (Anónimo)')" class="p-2.5 hover:bg-gray-100 cursor-pointer text-xs font-semibold text-gray-500 border-b">-- Venta al contado (Anónimo) --</div>`;
+            
+            if(clientes.length === 0) {
+                html += `<div class="p-3 text-xs text-gray-400 italic text-center">No se encontraron clientes</div>`;
+            } else {
+                clientes.forEach(c => {
+                    html += `<div onclick="seleccionarCliente('${c.id}', '${c.nombre}')" class="p-2.5 hover:bg-red-50 hover:text-brand-red cursor-pointer text-xs font-medium border-b border-gray-100 flex justify-between items-center">
+                        <span>${c.nombre}</span>
+                        <span class="text-[10px] text-gray-400">${c.telefono || ''}</span>
+                    </div>`;
+                });
+            }
+
+            contenedor.innerHTML = html;
+            contenedor.classList.remove('hidden');
+        }
+
+        window.seleccionarCliente = function(id, nombre) {
+            document.getElementById('venta-cliente-id').value = id;
+            document.getElementById('buscador-cliente').value = nombre;
+            document.getElementById('buscador-cliente').classList.add('hidden');
+            document.getElementById('lbl-nombre-seleccionado').innerText = nombre;
+            document.getElementById('cliente-seleccionado-badge').classList.remove('hidden');
+            document.getElementById('lista-sugerencias-clientes').classList.add('hidden');
+        }
+
+        window.quitarClienteSeleccionado = function() {
+            document.getElementById('venta-cliente-id').value = '';
+            document.getElementById('buscador-cliente').value = '';
+            document.getElementById('buscador-cliente').classList.remove('hidden');
+            document.getElementById('cliente-seleccionado-badge').classList.add('hidden');
+            document.getElementById('buscador-cliente').focus();
+        }
+
+        // Ocultar buscador si toca fuera
+        document.addEventListener('click', function(e) {
+            const buscador = document.getElementById('buscador-cliente');
+            const sugerencias = document.getElementById('lista-sugerencias-clientes');
+            if(buscador && sugerencias && !buscador.contains(e.target) && !sugerencias.contains(e.target)) {
+                sugerencias.classList.add('hidden');
+            }
+        });
+        // ---------------------------------------------
 
         window.agregarItemLibre = function() {
             const nombre = document.getElementById('item-nombre').value.trim();
@@ -464,6 +549,7 @@
                 document.getElementById('cli-nombre').value = '';
                 document.getElementById('cli-telefono').value = '';
                 cargarClientes();
+                precargarCacheClientes();
             } catch (e) {
                 console.error("Error al guardar cliente: ", e);
                 alert("Error al guardar cliente.");
@@ -504,20 +590,6 @@
                 document.getElementById('lista-clientes-container').innerHTML = html;
             } catch(e) {
                 console.error("Error cargando clientes:", e);
-            }
-        }
-
-        async function cargarSelectClientes() {
-            try {
-                const cliSnap = await getDocs(collection(db, "clientes"));
-                let cliOptions = '<option value="">-- Venta al contado (Anónimo) --</option>';
-                cliSnap.forEach(d => {
-                    const c = d.data();
-                    cliOptions += `<option value="${d.id}">${c.nombre}</option>`;
-                });
-                document.getElementById('venta-cliente').innerHTML = cliOptions;
-            } catch(e) {
-                console.error("Error cargando clientes en select:", e);
             }
         }
 
@@ -582,7 +654,6 @@
                             html += `<p class="text-[11px] text-amber-700 italic mt-1">Recargo por crédito aplicado: S/ ${v.recargo.toFixed(2)}</p>`;
                         }
                         
-                        // Botón para eliminar venta
                         html += `<div class="text-right pt-2 border-t border-gray-200 mt-2">
                             <button onclick="eliminarVenta('${mov.id}', '${clienteId}', ${v.total}, '${v.tipoPago}')" class="bg-red-50 hover:bg-red-100 text-brand-red text-xs px-3 py-1.5 rounded-lg font-semibold transition border border-red-200">
                                 <i class="fa-solid fa-trash mr-1"></i> Eliminar esta Venta
@@ -599,7 +670,6 @@
                             </div>
                             <p class="text-xs text-emerald-800 pt-1">El cliente abonó este monto a su cuenta pendiente.</p>
                             
-                            <!-- Botón para eliminar abono -->
                             <div class="text-right pt-2 border-t border-emerald-100 mt-2">
                                 <button onclick="eliminarAbono('${mov.id}', '${clienteId}', ${a.monto})" class="bg-white hover:bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-lg font-semibold transition border border-emerald-200">
                                     <i class="fa-solid fa-trash mr-1"></i> Eliminar este Abono
@@ -625,7 +695,6 @@
             if(!confirm("¿Estás segura de eliminar esta venta? Si fue a crédito, se restará de la deuda del cliente.")) return;
 
             try {
-                // Si la venta era a crédito, descontar del cliente
                 if(tipoPago === 'credito' && clienteId && clienteId !== 'anonimo') {
                     const cliRef = doc(db, "clientes", clienteId);
                     const cliSnap = await getDoc(cliRef);
@@ -636,11 +705,9 @@
                     }
                 }
 
-                // Borrar documento de venta
                 await deleteDoc(doc(db, "ventas", ventaId));
                 alert("Venta eliminada correctamente.");
                 
-                // Recargar historial y datos generales
                 verHistorialCliente(clienteActualModalId, clienteActualModalNombre);
                 cargarDashboard();
                 cargarClientes();
@@ -654,7 +721,6 @@
             if(!confirm("¿Estás segura de eliminar este abono? El monto se volverá a sumar a la deuda del cliente.")) return;
 
             try {
-                // Devolver el dinero a la deuda del cliente
                 const cliRef = doc(db, "clientes", clienteId);
                 const cliSnap = await getDoc(cliRef);
                 if(cliSnap.exists()) {
@@ -662,11 +728,9 @@
                     await updateDoc(cliRef, { deudaTotal: deudaActual + montoAbono });
                 }
 
-                // Borrar documento de abono
                 await deleteDoc(doc(db, "abonos", abonoId));
                 alert("Abono eliminado correctamente.");
 
-                // Recargar historial y datos generales
                 verHistorialCliente(clienteActualModalId, clienteActualModalNombre);
                 cargarDashboard();
                 cargarClientes();
@@ -711,12 +775,12 @@
                 return;
             }
 
-            const clienteId = document.getElementById('venta-cliente').value;
+            const clienteId = document.getElementById('venta-cliente-id').value;
             const tipoPago = document.getElementById('venta-tipo').value;
             const recargo = parseFloat(document.getElementById('venta-recargo').value) || 0;
 
             if(tipoPago === 'credito' && !clienteId) {
-                alert("Para registrar una venta a crédito / fiado, debes seleccionar obligatoriamente un cliente.");
+                alert("Para registrar una venta a crédito / fiado, debes seleccionar obligatoriamente un cliente usando el buscador.");
                 return;
             }
 
@@ -747,9 +811,9 @@
                 carritoLibre = [];
                 document.getElementById('venta-recargo').value = '0.00';
                 document.getElementById('venta-tipo').value = 'contado';
+                quitarClienteSeleccionado();
                 verificarTipoPago();
                 actualizarVistaCarrito();
-                cargarSelectClientes();
             } catch(e) {
                 console.error("Error al registrar venta:", e);
                 alert("Hubo un error al registrar la venta.");
