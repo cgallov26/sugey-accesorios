@@ -166,9 +166,9 @@
                         <i class="fa-solid fa-cart-shopping text-brand-red"></i> Datos de la Venta
                     </h2>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
-                        <!-- BUSCADOR INTERACTIVO DE CLIENTES (REEMPLAZA AL SELECT ANTIGUO) -->
+                        <!-- BUSCADOR INTERACTIVO DE CLIENTES -->
                         <div class="relative">
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Escribe para buscar o déjalo anónimo)</label>
                             <input type="hidden" id="venta-cliente-id" value="">
@@ -186,20 +186,10 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipo de Pago</label>
-                            <select id="venta-tipo" onchange="verificarTipoPago()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                            <select id="venta-tipo" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
                                 <option value="contado">Contado (Efectivo / Yape / Plin)</option>
                                 <option value="credito">Crédito / Cuenta Abierta (Fiado)</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <div id="seccion-recargo" class="mb-4 bg-amber-50 border border-amber-200 p-4 rounded-xl hidden">
-                        <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">
-                            <i class="fa-solid fa-coins mr-1"></i> Recargo por Crédito / Fiado (S/)
-                        </label>
-                        <div class="flex items-center gap-3">
-                            <input type="number" step="0.01" id="venta-recargo" value="0.00" oninput="actualizarVistaCarrito()" class="w-40 border border-amber-300 rounded-xl p-2 text-sm bg-white focus:ring-2 focus:ring-brand-red focus:outline-none font-bold text-brand-red">
-                            <p class="text-xs text-amber-700">Monto extra opcional a sumar al total por la modalidad de pago a plazos.</p>
                         </div>
                     </div>
                 </div>
@@ -229,15 +219,7 @@
                         <p class="text-gray-400 py-3 text-center italic">No hay productos agregados todavía.</p>
                     </div>
                     <div id="resumen-calculos" class="border-t border-gray-200 pt-4 mb-5 space-y-2 text-sm">
-                        <div class="flex justify-between text-gray-600">
-                            <span>Subtotal prendas:</span>
-                            <span id="carrito-subtotal">S/ 0.00</span>
-                        </div>
-                        <div id="fila-recargo-resumen" class="flex justify-between text-amber-700 hidden">
-                            <span>Recargo por crédito:</span>
-                            <span id="carrito-recargo-lbl">S/ 0.00</span>
-                        </div>
-                        <div class="flex justify-between items-center text-lg font-bold pt-2 border-t border-gray-100">
+                        <div class="flex justify-between items-center text-lg font-bold">
                             <span class="text-gray-800">Total a Pagar:</span>
                             <span id="carrito-total" class="text-brand-red text-xl">S/ 0.00</span>
                         </div>
@@ -311,7 +293,7 @@
         let carritoLibre = [];
         let clienteActualModalId = '';
         let clienteActualModalNombre = '';
-        let listaClientesCache = []; // Para búsqueda rápida sin recargar siempre
+        let listaClientesCache = []; 
 
         window.addEventListener('DOMContentLoaded', () => {
             if(sessionStorage.getItem('sugey_sesion_activa') === 'true') {
@@ -385,22 +367,6 @@
             }
         }
 
-        window.verificarTipoPago = function() {
-            const tipo = document.getElementById('venta-tipo').value;
-            const seccionRecargo = document.getElementById('seccion-recargo');
-            const filaRecargoResumen = document.getElementById('fila-recargo-resumen');
-
-            if(tipo === 'credito') {
-                seccionRecargo.classList.remove('hidden');
-                filaRecargoResumen.classList.remove('hidden');
-            } else {
-                seccionRecargo.classList.add('hidden');
-                filaRecargoResumen.classList.add('hidden');
-                document.getElementById('venta-recargo').value = '0.00';
-            }
-            actualizarVistaCarrito();
-        }
-
         // --- SISTEMA DE BÚSQUEDA DE CLIENTES MÓVIL ---
         async function precargarCacheClientes() {
             try {
@@ -464,7 +430,6 @@
             document.getElementById('buscador-cliente').focus();
         }
 
-        // Ocultar buscador si toca fuera
         document.addEventListener('click', function(e) {
             const buscador = document.getElementById('buscador-cliente');
             const sugerencias = document.getElementById('lista-sugerencias-clientes');
@@ -503,19 +468,17 @@
 
         function actualizarVistaCarrito() {
             const container = document.getElementById('carrito-lista');
-            let subtotal = 0;
+            let total = 0;
 
             if(carritoLibre.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 py-3 text-center italic">No hay productos agregados todavía.</p>';
-                document.getElementById('carrito-subtotal').innerText = 'S/ 0.00';
-                document.getElementById('carrito-recargo-lbl').innerText = 'S/ 0.00';
                 document.getElementById('carrito-total').innerText = 'S/ 0.00';
                 return;
             }
 
             let html = '';
             carritoLibre.forEach((item, idx) => {
-                subtotal += item.precio;
+                total += item.precio;
                 html += `<div class="flex justify-between items-center py-2">
                     <div>
                         <span class="font-semibold text-brand-dark">${item.nombre}</span>
@@ -526,11 +489,6 @@
             });
             container.innerHTML = html;
 
-            const recargo = parseFloat(document.getElementById('venta-recargo').value) || 0;
-            const total = subtotal + recargo;
-
-            document.getElementById('carrito-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
-            document.getElementById('carrito-recargo-lbl').innerText = `S/ ${recargo.toFixed(2)}`;
             document.getElementById('carrito-total').innerText = `S/ ${total.toFixed(2)}`;
         }
 
@@ -650,9 +608,6 @@
                         });
 
                         html += `</ul>`;
-                        if(v.recargo && v.recargo > 0) {
-                            html += `<p class="text-[11px] text-amber-700 italic mt-1">Recargo por crédito aplicado: S/ ${v.recargo.toFixed(2)}</p>`;
-                        }
                         
                         html += `<div class="text-right pt-2 border-t border-gray-200 mt-2">
                             <button onclick="eliminarVenta('${mov.id}', '${clienteId}', ${v.total}, '${v.tipoPago}')" class="bg-red-50 hover:bg-red-100 text-brand-red text-xs px-3 py-1.5 rounded-lg font-semibold transition border border-red-200">
@@ -777,15 +732,13 @@
 
             const clienteId = document.getElementById('venta-cliente-id').value;
             const tipoPago = document.getElementById('venta-tipo').value;
-            const recargo = parseFloat(document.getElementById('venta-recargo').value) || 0;
 
             if(tipoPago === 'credito' && !clienteId) {
                 alert("Para registrar una venta a crédito / fiado, debes seleccionar obligatoriamente un cliente usando el buscador.");
                 return;
             }
 
-            let subtotal = carritoLibre.reduce((acc, item) => acc + item.precio, 0);
-            let total = subtotal + recargo;
+            let total = carritoLibre.reduce((acc, item) => acc + item.precio, 0);
 
             try {
                 if(tipoPago === 'credito' && clienteId) {
@@ -801,18 +754,14 @@
                     clienteId: clienteId || 'anonimo',
                     tipoPago,
                     items: carritoLibre,
-                    subtotal,
-                    recargo,
                     total,
                     fecha: new Date().toISOString()
                 });
 
                 alert("¡Venta registrada con éxito!");
                 carritoLibre = [];
-                document.getElementById('venta-recargo').value = '0.00';
                 document.getElementById('venta-tipo').value = 'contado';
                 quitarClienteSeleccionado();
-                verificarTipoPago();
                 actualizarVistaCarrito();
             } catch(e) {
                 console.error("Error al registrar venta:", e);
