@@ -244,7 +244,12 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-base font-bold mb-4 text-brand-dark">Listado de Clientes, Cuentas y Deudas</h2>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-3 mb-4">
+                        <h2 class="text-base font-bold text-brand-dark">Listado de Clientes, Cuentas y Deudas</h2>
+                        <div class="w-full md:w-72">
+                            <input type="text" id="buscador-tabla-clientes" placeholder="🔍 Buscar cliente en la lista..." oninput="filtrarTablaClientes()" class="w-full border border-gray-300 rounded-xl p-2 text-xs bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                        </div>
+                    </div>
                     <div id="lista-clientes-container" class="overflow-x-auto">
                         <p class="text-gray-400 text-sm py-2">Cargando clientes...</p>
                     </div>
@@ -294,6 +299,7 @@
         let clienteActualModalId = '';
         let clienteActualModalNombre = '';
         let listaClientesCache = []; 
+        let listaClientesGeneralCache = []; // Para la tabla general de clientes
 
         window.addEventListener('DOMContentLoaded', () => {
             if(sessionStorage.getItem('sugey_sesion_activa') === 'true') {
@@ -517,38 +523,57 @@
         async function cargarClientes() {
             try {
                 const querySnapshot = await getDocs(collection(db, "clientes"));
-                let html = `<table class="w-full text-left text-sm"><thead class="border-b bg-gray-50 text-gray-600"><tr><th class="p-3">Cliente</th><th class="p-3">Teléfono</th><th class="p-3">Deuda Pendiente</th><th class="p-3 text-center">Acciones / Historial</th></tr></thead><tbody class="divide-y divide-gray-100">`;
-                
-                if(querySnapshot.empty) {
-                    document.getElementById('lista-clientes-container').innerHTML = '<p class="text-gray-400 text-sm py-3 text-center italic">No hay clientes registrados.</p>';
-                    return;
-                }
-
+                listaClientesGeneralCache = [];
                 querySnapshot.forEach((docSnap) => {
-                    const c = docSnap.data();
-                    const clienteId = docSnap.id;
-                    const deuda = c.deudaTotal || 0;
-                    
-                    let badgeDeuda = `<span class="bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-lg text-xs font-semibold">Al día (S/ 0.00)</span>`;
-                    if(deuda > 0) {
-                        badgeDeuda = `<span class="bg-red-50 text-brand-red border border-red-200 px-2.5 py-1 rounded-lg text-xs font-bold">S/ ${deuda.toFixed(2)} pendiente</span>`;
-                    }
-
-                    html += `<tr>
-                        <td class="p-3 font-semibold text-brand-dark">${c.nombre}</td>
-                        <td class="p-3 text-gray-600">${c.telefono || '-'}</td>
-                        <td class="p-3">${badgeDeuda}</td>
-                        <td class="p-3 text-center space-x-2">
-                            <button onclick="verHistorialCliente('${clienteId}', '${c.nombre}')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm"><i class="fa-solid fa-clock-rotate-left mr-1 text-brand-red"></i> Historial</button>
-                            ${deuda > 0 ? `<button onclick="registrarAbono('${clienteId}',${deuda})" class="bg-brand-dark hover:bg-black text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm"><i class="fa-solid fa-money-bill-wave mr-1"></i> Abonar</button>` : ''}
-                        </td>
-                    </tr>`;
+                    listaClientesGeneralCache.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                html += `</tbody></table>`;
-                document.getElementById('lista-clientes-container').innerHTML = html;
+                renderizarTablaClientes(listaClientesGeneralCache);
             } catch(e) {
                 console.error("Error cargando clientes:", e);
             }
+        }
+
+        window.filtrarTablaClientes = function() {
+            const texto = document.getElementById('buscador-tabla-clientes').value.toLowerCase().trim();
+            if(!texto) {
+                renderizarTablaClientes(listaClientesGeneralCache);
+                return;
+            }
+            const filtrados = listaClientesGeneralCache.filter(c => 
+                c.nombre.toLowerCase().includes(texto) || (c.telefono && c.telefono.toLowerCase().includes(texto))
+            );
+            renderizarTablaClientes(filtrados);
+        }
+
+        function renderizarTablaClientes(clientes) {
+            let html = `<table class="w-full text-left text-sm"><thead class="border-b bg-gray-50 text-gray-600"><tr><th class="p-3">Cliente</th><th class="p-3">Teléfono</th><th class="p-3">Deuda Pendiente</th><th class="p-3 text-center">Acciones / Historial</th></tr></thead><tbody class="divide-y divide-gray-100">`;
+            
+            if(clientes.length === 0) {
+                document.getElementById('lista-clientes-container').innerHTML = '<p class="text-gray-400 text-sm py-3 text-center italic">No se encontraron clientes.</p>';
+                return;
+            }
+
+            clientes.forEach((c) => {
+                const clienteId = c.id;
+                const deuda = c.deudaTotal || 0;
+                
+                let badgeDeuda = `<span class="bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-lg text-xs font-semibold">Al día (S/ 0.00)</span>`;
+                if(deuda > 0) {
+                    badgeDeuda = `<span class="bg-red-50 text-brand-red border border-red-200 px-2.5 py-1 rounded-lg text-xs font-bold">S/ ${deuda.toFixed(2)} pendiente</span>`;
+                }
+
+                html += `<tr>
+                    <td class="p-3 font-semibold text-brand-dark">${c.nombre}</td>
+                    <td class="p-3 text-gray-650 whitespace-nowrap">${c.telefono || '-'}</td>
+                    <td class="p-3">${badgeDeuda}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="verHistorialCliente('${clienteId}', '${c.nombre}')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm"><i class="fa-solid fa-clock-rotate-left mr-1 text-brand-red"></i> Historial</button>
+                        ${deuda > 0 ? `<button onclick="registrarAbono('${clienteId}',${deuda})" class="bg-brand-dark hover:bg-black text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm"><i class="fa-solid fa-money-bill-wave mr-1"></i> Abonar</button>` : ''}
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            document.getElementById('lista-clientes-container').innerHTML = html;
         }
 
         window.verHistorialCliente = async function(clienteId, clienteNombre) {
