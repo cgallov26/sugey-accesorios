@@ -27,229 +27,259 @@
 </head>
 <body class="bg-brand-light text-brand-dark antialiased">
 
-    <!-- CABECERA -->
-    <header class="bg-brand-dark text-white shadow-lg border-b-4 border-brand-red">
-        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <!-- LOGO REAL -->
-                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-brand-red shadow-md flex-shrink-0">
-                    <img src="image_93adc6.png" alt="Logo Sugey Accesorios & Más" class="w-full h-full object-cover">
-                </div>
+    <!-- PANTALLA DE LOGIN (PRIMERO APARECE ESTA) -->
+    <div id="pantalla-login" class="fixed inset-0 bg-brand-dark flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center space-y-6 border-t-8 border-brand-red">
+            <div class="w-20 h-20 rounded-full bg-white mx-auto flex items-center justify-center overflow-hidden border-2 border-brand-red shadow-md">
+                <img src="image_93adc6.png" alt="Logo Sugey Accesorios & Más" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-brand-dark">Sugey Accesorios & Más</h2>
+                <p class="text-xs text-gray-500 mt-1">Ingresa tu contraseña para acceder al sistema</p>
+            </div>
+            
+            <form onsubmit="intentarLogin(event)" class="space-y-4">
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide">Sugey Accesorios & Más</h1>
-                    <p class="text-xs text-gray-400">Sistema de Venta Libre y Cuentas</p>
+                    <input type="password" id="input-password" placeholder="Contraseña o PIN" class="w-full border border-gray-300 rounded-xl p-3 text-center text-lg tracking-widest focus:ring-2 focus:ring-brand-red focus:outline-none bg-gray-50" required>
                 </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-xs bg-brand-red text-white px-3 py-1 rounded-full font-medium shadow-sm">
-                    <i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i> Moneda: Soles (S/)
-                </span>
-            </div>
-        </div>
-    </header>
-
-    <!-- CONTENEDOR PRINCIPAL -->
-    <main class="container mx-auto px-4 py-6 max-w-4xl">
-        
-        <!-- PESTAÑAS DE NAVEGACIÓN -->
-        <div class="flex flex-wrap space-x-2 mb-6 border-b border-gray-200 pb-2 gap-y-2">
-            <button onclick="cambiarTab('dashboard')" id="btn-dashboard" class="px-5 py-2.5 bg-brand-red text-white rounded-xl font-semibold text-sm shadow-md transition flex items-center gap-2">
-                <i class="fa-solid fa-chart-pie"></i> Inicio / Resumen
-            </button>
-            <button onclick="cambiarTab('ventas')" id="btn-ventas" class="px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2">
-                <i class="fa-solid fa-cash-register"></i> Registrar Venta
-            </button>
-            <button onclick="cambiarTab('clientes')" id="btn-clientes" class="px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2">
-                <i class="fa-solid fa-users"></i> Clientes y Créditos / Fiados
-            </button>
-        </div>
-
-        <!-- SECCIÓN: DASHBOARD (INICIO) -->
-        <section id="tab-dashboard" class="space-y-6">
-            <div class="bg-gradient-to-r from-brand-dark to-gray-800 text-white p-6 rounded-2xl shadow-md">
-                <h2 class="text-lg font-bold mb-1">¡Bienvenida de nuevo, Sugey! 👗</h2>
-                <p class="text-xs text-gray-300">Aquí tienes un vistazo rápido al estado actual de tu negocio.</p>
-            </div>
-
-            <!-- TARJETAS DE MÉTRICAS -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-red-50 text-brand-red rounded-xl flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-money-bill-trend-up"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase">Ventas Totales Registradas</p>
-                        <h3 id="dash-total-ventas" class="text-xl font-bold text-brand-dark">S/ 0.00</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase">Deuda Total en Fiados</p>
-                        <h3 id="dash-total-deudas" class="text-xl font-bold text-brand-red">S/ 0.00</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-user-group"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase">Clientes Registrados</p>
-                        <h3 id="dash-total-clientes" class="text-xl font-bold text-brand-dark">0</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACCESOS DIRECTOS DESDE EL DASHBOARD -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-brand-dark mb-4">Acciones Rápidas</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <button onclick="cambiarTab('ventas')" class="p-4 rounded-xl border border-gray-200 hover:border-brand-red hover:bg-red-50 transition text-left flex items-center space-x-3 group">
-                        <div class="w-10 h-10 bg-brand-red text-white rounded-lg flex items-center justify-center shadow">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-brand-dark group-hover:text-brand-red">Registrar una Venta</h4>
-                            <p class="text-xs text-gray-500">Anota prendas o accesorios al vuelo</p>
-                        </div>
-                    </button>
-
-                    <button onclick="cambiarTab('clientes')" class="p-4 rounded-xl border border-gray-200 hover:border-brand-dark hover:bg-gray-50 transition text-left flex items-center space-x-3 group">
-                        <div class="w-10 h-10 bg-brand-dark text-white rounded-lg flex items-center justify-center shadow">
-                            <i class="fa-solid fa-users-rectangle"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-brand-dark">Revisar Cuentas / Fiados</h4>
-                            <p class="text-xs text-gray-500">Ver historiales y registrar abonos</p>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN: NUEVA VENTA LIBRE -->
-        <section id="tab-ventas" class="space-y-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
-                    <i class="fa-solid fa-cart-shopping text-brand-red"></i> Datos de la Venta
-                </h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Opcional si es al contado)</label>
-                        <select id="venta-cliente" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
-                            <option value="">-- Venta al contado (Anónimo) --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipo de Pago</label>
-                        <select id="venta-tipo" onchange="verificarTipoPago()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
-                            <option value="contado">Contado (Efectivo / Yape / Plin)</option>
-                            <option value="credito">Crédito / Cuenta Abierta (Fiado)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Recargo por fiado opcional -->
-                <div id="seccion-recargo" class="mb-4 bg-amber-50 border border-amber-200 p-4 rounded-xl hidden">
-                    <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">
-                        <i class="fa-solid fa-coins mr-1"></i> Recargo por Crédito / Fiado (S/)
-                    </label>
-                    <div class="flex items-center gap-3">
-                        <input type="number" step="0.01" id="venta-recargo" value="0.00" oninput="actualizarVistaCarrito()" class="w-40 border border-amber-300 rounded-xl p-2 text-sm bg-white focus:ring-2 focus:ring-brand-red focus:outline-none font-bold text-brand-red">
-                        <p class="text-xs text-amber-700">Monto extra opcional a sumar al total por la modalidad de pago a plazos.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AGREGAR PRODUCTO AL VUELO -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="font-bold mb-3 text-brand-dark text-sm uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-tag text-brand-red"></i> Escribir Prenda o Accesorio que se lleva
-                </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
-                    <input type="text" id="item-nombre" placeholder="Nombre (Ej. Blusa elegante)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none md:col-span-1">
-                    <input type="text" id="item-color" placeholder="Color (Ej. Rojo, Negro)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
-                    <input type="text" id="item-talla" placeholder="Talla (S, M, L o Única)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
-                    <input type="number" step="0.01" id="item-precio" placeholder="Precio (S/)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
-                </div>
-
-                <button onclick="agregarItemLibre()" class="w-full bg-brand-dark hover:bg-black text-white py-2.5 rounded-xl font-medium text-sm transition flex items-center justify-center gap-2 shadow">
-                    <i class="fa-solid fa-plus"></i> Agregar Prenda a la Lista
+                <button type="submit" class="w-full bg-brand-red hover:bg-red-700 text-white py-3 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock-open"></i> Entrar al Sistema
                 </button>
-            </div>
-
-            <!-- RESUMEN DE LA VENTA -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="font-bold mb-3 text-brand-dark text-sm uppercase tracking-wider">Productos en esta venta</h3>
-                <div id="carrito-lista" class="divide-y divide-gray-100 mb-4 text-sm">
-                    <p class="text-gray-400 py-3 text-center italic">No hay productos agregados todavía.</p>
-                </div>
-                <div id="resumen-calculos" class="border-t border-gray-200 pt-4 mb-5 space-y-2 text-sm">
-                    <div class="flex justify-between text-gray-600">
-                        <span>Subtotal prendas:</span>
-                        <span id="carrito-subtotal">S/ 0.00</span>
-                    </div>
-                    <div id="fila-recargo-resumen" class="flex justify-between text-amber-700 hidden">
-                        <span>Recargo por crédito:</span>
-                        <span id="carrito-recargo-lbl">S/ 0.00</span>
-                    </div>
-                    <div class="flex justify-between items-center text-lg font-bold pt-2 border-t border-gray-100">
-                        <span class="text-gray-800">Total a Pagar:</span>
-                        <span id="carrito-total" class="text-brand-red text-xl">S/ 0.00</span>
-                    </div>
-                </div>
-                <button onclick="finalizarVenta()" class="w-full bg-brand-red hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check-circle"></i> Completar y Registrar Venta
-                </button>
-            </div>
-        </section>
-
-        <!-- SECCIÓN: CLIENTES Y CRÉDITOS -->
-        <section id="tab-clientes" class="space-y-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-brand-red"></i> Registrar Nuevo Cliente
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                    <input type="text" id="cli-nombre" placeholder="Nombre completo" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
-                    <input type="text" id="cli-telefono" placeholder="Teléfono / WhatsApp" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
-                    <button onclick="guardarCliente()" class="bg-brand-dark hover:bg-black text-white rounded-xl py-2.5 text-sm font-medium transition shadow">Guardar Cliente</button>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-base font-bold mb-4 text-brand-dark">Listado de Clientes, Cuentas y Deudas</h2>
-                <div id="lista-clientes-container" class="overflow-x-auto">
-                    <p class="text-gray-400 text-sm py-2">Cargando clientes...</p>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL HISTORIAL DE COMPRAS Y ABONOS -->
-    <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 id="historial-titulo" class="text-lg font-bold text-brand-dark">Historial de Movimientos</h3>
-                <button onclick="cerrarHistorial()" class="text-gray-400 hover:text-brand-red text-lg p-1"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="historial-contenido" class="space-y-3 text-sm">
-                <p class="text-gray-400 italic">Cargando historial...</p>
-            </div>
-            <div class="mt-6 text-right">
-                <button onclick="cerrarHistorial()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-xl text-sm font-medium transition">Cerrar</button>
-            </div>
+            </form>
+            <p class="text-[10px] text-gray-400">Protegido exclusivamente para uso del negocio.</p>
         </div>
     </div>
 
-    <!-- SCRIPT DE FIREBASE -->
+    <!-- APLICACIÓN PRINCIPAL (OCULTA HASTA QUE INICIE SESIÓN) -->
+    <div id="app-principal" class="hidden">
+        
+        <!-- CABECERA -->
+        <header class="bg-brand-dark text-white shadow-lg border-b-4 border-brand-red">
+            <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-brand-red shadow-md flex-shrink-0">
+                        <img src="image_93adc6.png" alt="Logo Sugey Accesorios & Más" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-wide">Sugey Accesorios & Más</h1>
+                        <p class="text-xs text-gray-400">Sistema de Venta Libre y Cuentas</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs bg-brand-red text-white px-3 py-1 rounded-full font-medium shadow-sm">
+                        <i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i> Soles (S/)
+                    </span>
+                    <button onclick="cerrarSesion()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-xl font-medium transition flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Salir
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENEDOR PRINCIPAL -->
+        <main class="container mx-auto px-4 py-6 max-w-4xl">
+            
+            <!-- PESTAÑAS DE NAVEGACIÓN -->
+            <div class="flex flex-wrap space-x-2 mb-6 border-b border-gray-200 pb-2 gap-y-2">
+                <button onclick="cambiarTab('dashboard')" id="btn-dashboard" class="px-5 py-2.5 bg-brand-red text-white rounded-xl font-semibold text-sm shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> Inicio / Resumen
+                </button>
+                <button onclick="cambiarTab('ventas')" id="btn-ventas" class="px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-cash-register"></i> Registrar Venta
+                </button>
+                <button onclick="cambiarTab('clientes')" id="btn-clientes" class="px-5 py-2.5 bg-white text-gray-700 hover:bg-gray-100 rounded-xl font-medium text-sm border shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> Clientes y Créditos / Fiados
+                </button>
+            </div>
+
+            <!-- SECCIÓN: DASHBOARD (INICIO) -->
+            <section id="tab-dashboard" class="space-y-6">
+                <div class="bg-gradient-to-r from-brand-dark to-gray-800 text-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-lg font-bold mb-1">¡Bienvenida de nuevo, Sugey! 👗</h2>
+                    <p class="text-xs text-gray-300">Aquí tienes un vistazo rápido al estado actual de tu negocio.</p>
+                </div>
+
+                <!-- TARJETAS DE MÉTRICAS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-red-50 text-brand-red rounded-xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-money-bill-trend-up"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase">Ventas Totales Registradas</p>
+                            <h3 id="dash-total-ventas" class="text-xl font-bold text-brand-dark">S/ 0.00</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase">Deuda Total en Fiados</p>
+                            <h3 id="dash-total-deudas" class="text-xl font-bold text-brand-red">S/ 0.00</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase">Clientes Registrados</p>
+                            <h3 id="dash-total-clientes" class="text-xl font-bold text-brand-dark">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCESOS DIRECTOS DESDE EL DASHBOARD -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-brand-dark mb-4">Acciones Rápidas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button onclick="cambiarTab('ventas')" class="p-4 rounded-xl border border-gray-200 hover:border-brand-red hover:bg-red-50 transition text-left flex items-center space-x-3 group">
+                            <div class="w-10 h-10 bg-brand-red text-white rounded-lg flex items-center justify-center shadow">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-brand-dark group-hover:text-brand-red">Registrar una Venta</h4>
+                                <p class="text-xs text-gray-500">Anota prendas o accesorios al vuelo</p>
+                            </div>
+                        </button>
+
+                        <button onclick="cambiarTab('clientes')" class="p-4 rounded-xl border border-gray-200 hover:border-brand-dark hover:bg-gray-50 transition text-left flex items-center space-x-3 group">
+                            <div class="w-10 h-10 bg-brand-dark text-white rounded-lg flex items-center justify-center shadow">
+                                <i class="fa-solid fa-users-rectangle"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-brand-dark">Revisar Cuentas / Fiados</h4>
+                                <p class="text-xs text-gray-500">Ver historiales y registrar abonos</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: NUEVA VENTA LIBRE -->
+            <section id="tab-ventas" class="space-y-4 hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-brand-red"></i> Datos de la Venta
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Opcional si es al contado)</label>
+                            <select id="venta-cliente" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                                <option value="">-- Venta al contado (Anónimo) --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipo de Pago</label>
+                            <select id="venta-tipo" onchange="verificarTipoPago()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                                <option value="contado">Contado (Efectivo / Yape / Plin)</option>
+                                <option value="credito">Crédito / Cuenta Abierta (Fiado)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Recargo por fiado opcional -->
+                    <div id="seccion-recargo" class="mb-4 bg-amber-50 border border-amber-200 p-4 rounded-xl hidden">
+                        <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">
+                            <i class="fa-solid fa-coins mr-1"></i> Recargo por Crédito / Fiado (S/)
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="number" step="0.01" id="venta-recargo" value="0.00" oninput="actualizarVistaCarrito()" class="w-40 border border-amber-300 rounded-xl p-2 text-sm bg-white focus:ring-2 focus:ring-brand-red focus:outline-none font-bold text-brand-red">
+                            <p class="text-xs text-amber-700">Monto extra opcional a sumar al total por la modalidad de pago a plazos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AGREGAR PRODUCTO AL VUELO -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold mb-3 text-brand-dark text-sm uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-tag text-brand-red"></i> Escribir Prenda o Accesorio que se lleva
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                        <input type="text" id="item-nombre" placeholder="Nombre (Ej. Blusa elegante)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none md:col-span-1">
+                        <input type="text" id="item-color" placeholder="Color (Ej. Rojo, Negro)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                        <input type="text" id="item-talla" placeholder="Talla (S, M, L o Única)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                        <input type="number" step="0.01" id="item-precio" placeholder="Precio (S/)" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                    </div>
+
+                    <button onclick="agregarItemLibre()" class="w-full bg-brand-dark hover:bg-black text-white py-2.5 rounded-xl font-medium text-sm transition flex items-center justify-center gap-2 shadow">
+                        <i class="fa-solid fa-plus"></i> Agregar Prenda a la Lista
+                    </button>
+                </div>
+
+                <!-- RESUMEN DE LA VENTA -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold mb-3 text-brand-dark text-sm uppercase tracking-wider">Productos en esta venta</h3>
+                    <div id="carrito-lista" class="divide-y divide-gray-100 mb-4 text-sm">
+                        <p class="text-gray-400 py-3 text-center italic">No hay productos agregados todavía.</p>
+                    </div>
+                    <div id="resumen-calculos" class="border-t border-gray-200 pt-4 mb-5 space-y-2 text-sm">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Subtotal prendas:</span>
+                            <span id="carrito-subtotal">S/ 0.00</span>
+                        </div>
+                        <div id="fila-recargo-resumen" class="flex justify-between text-amber-700 hidden">
+                            <span>Recargo por crédito:</span>
+                            <span id="carrito-recargo-lbl">S/ 0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg font-bold pt-2 border-t border-gray-100">
+                            <span class="text-gray-800">Total a Pagar:</span>
+                            <span id="carrito-total" class="text-brand-red text-xl">S/ 0.00</span>
+                        </div>
+                    </div>
+                    <button onclick="finalizarVenta()" class="w-full bg-brand-red hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> Completar y Registrar Venta
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: CLIENTES Y CRÉDITOS -->
+            <section id="tab-clientes" class="space-y-4 hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-brand-red"></i> Registrar Nuevo Cliente
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                        <input type="text" id="cli-nombre" placeholder="Nombre completo" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                        <input type="text" id="cli-telefono" placeholder="Teléfono / WhatsApp" class="border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-red focus:outline-none">
+                        <button onclick="guardarCliente()" class="bg-brand-dark hover:bg-black text-white rounded-xl py-2.5 text-sm font-medium transition shadow">Guardar Cliente</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-base font-bold mb-4 text-brand-dark">Listado de Clientes, Cuentas y Deudas</h2>
+                    <div id="lista-clientes-container" class="overflow-x-auto">
+                        <p class="text-gray-400 text-sm py-2">Cargando clientes...</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- MODAL HISTORIAL DE COMPRAS Y ABONOS -->
+        <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+            <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4 border-b pb-3">
+                    <h3 id="historial-titulo" class="text-lg font-bold text-brand-dark">Historial de Movimientos</h3>
+                    <button onclick="cerrarHistorial()" class="text-gray-400 hover:text-brand-red text-lg p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="historial-contenido" class="space-y-3 text-sm">
+                    <p class="text-gray-400 italic">Cargando historial...</p>
+                </div>
+                <div class="mt-6 text-right">
+                    <button onclick="cerrarHistorial()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-xl text-sm font-medium transition">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE FIREBASE Y LOGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -266,7 +296,44 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // CONFIGURA AQUÍ SU CONTRASEÑA O PIN SECRETO
+        const PASSWORD_SECRETA = "2026"; 
+
         let carritoLibre = [];
+
+        // REVISAR SI YA ESTABA LOGUEADO EN ESTA SESIÓN
+        window.addEventListener('DOMContentLoaded', () => {
+            if(sessionStorage.getItem('sugey_sesion_activa') === 'true') {
+                mostrarApp();
+            }
+        });
+
+        window.intentarLogin = function(event) {
+            event.preventDefault();
+            const pass = document.getElementById('input-password').value;
+
+            if(pass === PASSWORD_SECRETA) {
+                sessionStorage.setItem('sugey_sesion_activa', 'true');
+                mostrarApp();
+            } else {
+                alert("Contraseña incorrecta. Inténtalo de nuevo.");
+                document.getElementById('input-password').value = '';
+                document.getElementById('input-password').focus();
+            }
+        }
+
+        window.cerrarSesion = function() {
+            sessionStorage.removeItem('sugey_sesion_activa');
+            document.getElementById('app-principal').classList.add('hidden');
+            document.getElementById('pantalla-login').classList.remove('hidden');
+            document.getElementById('input-password').value = '';
+        }
+
+        function mostrarApp() {
+            document.getElementById('pantalla-login').classList.add('hidden');
+            document.getElementById('app-principal').classList.remove('hidden');
+            cargarDashboard();
+        }
 
         window.cambiarTab = function(tab) {
             ['dashboard', 'ventas', 'clientes'].forEach(t => {
@@ -618,8 +685,6 @@
                 alert("Hubo un error al registrar la venta.");
             }
         }
-
-        cargarDashboard();
     </script>
 </body>
 </html>
