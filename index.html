@@ -27,7 +27,7 @@
 </head>
 <body class="bg-brand-light text-brand-dark antialiased">
 
-    <!-- PANTALLA DE LOGIN (PRIMERO APARECE ESTA) -->
+    <!-- PANTALLA DE LOGIN -->
     <div id="pantalla-login" class="fixed inset-0 bg-brand-dark flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center space-y-6 border-t-8 border-brand-red">
             <div class="w-20 h-20 rounded-full bg-white mx-auto flex items-center justify-center overflow-hidden border-2 border-brand-red shadow-md">
@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL (OCULTA HASTA QUE INICIE SESIÓN) -->
+    <!-- APLICACIÓN PRINCIPAL -->
     <div id="app-principal" class="hidden">
         
         <!-- CABECERA -->
@@ -132,7 +132,7 @@
                     </div>
                 </div>
 
-                <!-- ACCESOS DIRECTOS DESDE EL DASHBOARD -->
+                <!-- ACCESOS DIRECTOS -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-brand-dark mb-4">Acciones Rápidas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -182,7 +182,6 @@
                         </div>
                     </div>
 
-                    <!-- Recargo por fiado opcional -->
                     <div id="seccion-recargo" class="mb-4 bg-amber-50 border border-amber-200 p-4 rounded-xl hidden">
                         <label class="block text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">
                             <i class="fa-solid fa-coins mr-1"></i> Recargo por Crédito / Fiado (S/)
@@ -282,7 +281,7 @@
     <!-- SCRIPT DE FIREBASE Y LOGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAAJ-0T2nRy7awJ92eKIQKHbnLQVk-fF0U",
@@ -296,12 +295,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // CONFIGURA AQUÍ SU CONTRASEÑA O PIN SECRETO
-        const PASSWORD_SECRETA = "27021997"; 
+        const PASSWORD_SECRETA = "17021997"; 
 
         let carritoLibre = [];
+        let clienteActualModalId = '';
+        let clienteActualModalNombre = '';
 
-        // REVISAR SI YA ESTABA LOGUEADO EN ESTA SESIÓN
         window.addEventListener('DOMContentLoaded', () => {
             if(sessionStorage.getItem('sugey_sesion_activa') === 'true') {
                 mostrarApp();
@@ -523,6 +522,8 @@
         }
 
         window.verHistorialCliente = async function(clienteId, clienteNombre) {
+            clienteActualModalId = clienteId;
+            clienteActualModalNombre = clienteNombre;
             document.getElementById('historial-titulo').innerText = `Historial de Movimientos: ${clienteNombre}`;
             document.getElementById('historial-contenido').innerHTML = '<p class="text-gray-400 italic py-4 text-center">Buscando compras y abonos...</p>';
             document.getElementById('modal-historial').classList.remove('hidden');
@@ -538,12 +539,12 @@
 
                 snapVentas.forEach(docSnap => {
                     let v = docSnap.data();
-                    movimientos.push({ tipo: 'venta', fecha: v.fecha, data: v });
+                    movimientos.push({ id: docSnap.id, tipo: 'venta', fecha: v.fecha, data: v });
                 });
 
                 snapAbonos.forEach(docSnap => {
                     let a = docSnap.data();
-                    movimientos.push({ tipo: 'abono', fecha: a.fecha, data: a });
+                    movimientos.push({ id: docSnap.id, tipo: 'abono', fecha: a.fecha, data: a });
                 });
 
                 movimientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
@@ -580,6 +581,13 @@
                         if(v.recargo && v.recargo > 0) {
                             html += `<p class="text-[11px] text-amber-700 italic mt-1">Recargo por crédito aplicado: S/ ${v.recargo.toFixed(2)}</p>`;
                         }
+                        
+                        // Botón para eliminar venta
+                        html += `<div class="text-right pt-2 border-t border-gray-200 mt-2">
+                            <button onclick="eliminarVenta('${mov.id}', '${clienteId}', ${v.total}, '${v.tipoPago}')" class="bg-red-50 hover:bg-red-100 text-brand-red text-xs px-3 py-1.5 rounded-lg font-semibold transition border border-red-200">
+                                <i class="fa-solid fa-trash mr-1"></i> Eliminar esta Venta
+                            </button>
+                        </div>`;
                         html += `</div>`;
 
                     } else if(mov.tipo === 'abono') {
@@ -590,6 +598,13 @@
                                 <span class="font-bold text-emerald-700 text-sm">+ S/ ${a.monto.toFixed(2)}</span>
                             </div>
                             <p class="text-xs text-emerald-800 pt-1">El cliente abonó este monto a su cuenta pendiente.</p>
+                            
+                            <!-- Botón para eliminar abono -->
+                            <div class="text-right pt-2 border-t border-emerald-100 mt-2">
+                                <button onclick="eliminarAbono('${mov.id}', '${clienteId}', ${a.monto})" class="bg-white hover:bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-lg font-semibold transition border border-emerald-200">
+                                    <i class="fa-solid fa-trash mr-1"></i> Eliminar este Abono
+                                </button>
+                            </div>
                         </div>`;
                     }
                 });
@@ -604,6 +619,61 @@
 
         window.cerrarHistorial = function() {
             document.getElementById('modal-historial').classList.add('hidden');
+        }
+
+        window.eliminarVenta = async function(ventaId, clienteId, totalVenta, tipoPago) {
+            if(!confirm("¿Estás segura de eliminar esta venta? Si fue a crédito, se restará de la deuda del cliente.")) return;
+
+            try {
+                // Si la venta era a crédito, descontar del cliente
+                if(tipoPago === 'credito' && clienteId && clienteId !== 'anonimo') {
+                    const cliRef = doc(db, "clientes", clienteId);
+                    const cliSnap = await getDoc(cliRef);
+                    if(cliSnap.exists()) {
+                        const deudaActual = cliSnap.data().deudaTotal || 0;
+                        const nuevaDeuda = Math.max(0, deudaActual - totalVenta);
+                        await updateDoc(cliRef, { deudaTotal: nuevaDeuda });
+                    }
+                }
+
+                // Borrar documento de venta
+                await deleteDoc(doc(db, "ventas", ventaId));
+                alert("Venta eliminada correctamente.");
+                
+                // Recargar historial y datos generales
+                verHistorialCliente(clienteActualModalId, clienteActualModalNombre);
+                cargarDashboard();
+                cargarClientes();
+            } catch(e) {
+                console.error("Error al eliminar venta:", e);
+                alert("Hubo un error al eliminar la venta.");
+            }
+        }
+
+        window.eliminarAbono = async function(abonoId, clienteId, montoAbono) {
+            if(!confirm("¿Estás segura de eliminar este abono? El monto se volverá a sumar a la deuda del cliente.")) return;
+
+            try {
+                // Devolver el dinero a la deuda del cliente
+                const cliRef = doc(db, "clientes", clienteId);
+                const cliSnap = await getDoc(cliRef);
+                if(cliSnap.exists()) {
+                    const deudaActual = cliSnap.data().deudaTotal || 0;
+                    await updateDoc(cliRef, { deudaTotal: deudaActual + montoAbono });
+                }
+
+                // Borrar documento de abono
+                await deleteDoc(doc(db, "abonos", abonoId));
+                alert("Abono eliminado correctamente.");
+
+                // Recargar historial y datos generales
+                verHistorialCliente(clienteActualModalId, clienteActualModalNombre);
+                cargarDashboard();
+                cargarClientes();
+            } catch(e) {
+                console.error("Error al eliminar abono:", e);
+                alert("Hubo un error al eliminar el abono.");
+            }
         }
 
         window.registrarAbono = async function(clienteId, deudaActual) {
