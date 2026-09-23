@@ -62,7 +62,7 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-bold tracking-wide">Sugey Accesorios & Más</h1>
-                        <p class="text-xs text-gray-400">Sistema de Venta Libre y Cuentas</p>
+                        <p class="text-xs text-gray-400">Sistema de Ventas y Cuentas a Crédito</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -142,7 +142,7 @@
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm text-brand-dark group-hover:text-brand-red">Registrar una Venta</h4>
-                                <p class="text-xs text-gray-500">Anota prendas o accesorios al vuelo</p>
+                                <p class="text-xs text-gray-500">Anota prendas o accesorios al crédito</p>
                             </div>
                         </button>
 
@@ -159,37 +159,29 @@
                 </div>
             </section>
 
-            <!-- SECCIÓN: NUEVA VENTA LIBRE -->
+            <!-- SECCIÓN: NUEVA VENTA (CRÉDITO / FIADO) -->
             <section id="tab-ventas" class="space-y-4 hidden">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h2 class="text-base font-bold mb-4 text-brand-dark flex items-center gap-2">
-                        <i class="fa-solid fa-cart-shopping text-brand-red"></i> Datos de la Venta
+                        <i class="fa-solid fa-cart-shopping text-brand-red"></i> Datos de la Venta (Crédito / Fiado)
                     </h2>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
-                        <!-- BUSCADOR INTERACTIVO DE CLIENTES -->
+                        <!-- BUSCADOR INTERACTIVO DE CLIENTES (OBLIGATORIO) -->
                         <div class="relative">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente (Escribe su nombre)</label>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cliente <span class="text-brand-red">*Obligatorio</span></label>
                             <input type="hidden" id="venta-cliente-id" value="">
-                            <input type="text" id="buscador-cliente" placeholder="🔍 Escribe el nombre..." oninput="filtrarClientesVenta()" onclick="mostrarListaClientesVenta()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
+                            <input type="text" id="buscador-cliente" placeholder="🔍 Busca y selecciona el cliente..." oninput="filtrarClientesVenta()" onclick="mostrarListaClientesVenta()" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
                             
                             <!-- Lista desplegable flotante de resultados -->
                             <div id="lista-sugerencias-clientes" class="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden z-20">
                                 <!-- Se llena dinámicamente -->
                             </div>
                             <div id="cliente-seleccionado-badge" class="mt-1 text-xs text-brand-red font-semibold hidden flex items-center justify-between">
-                                <span>Cliente: <strong id="lbl-nombre-seleccionado"></strong></span>
+                                <span>Cliente seleccionado: <strong id="lbl-nombre-seleccionado"></strong></span>
                                 <button onclick="quitarClienteSeleccionado()" class="text-gray-400 hover:text-red-600 underline">Cambiar</button>
                             </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tipo de Pago</label>
-                            <select id="venta-tipo" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-brand-red focus:outline-none">
-                                <option value="contado">Contado (Efectivo / Yape / Plin)</option>
-                                <option value="credito">Crédito / Cuenta Abierta (Fiado)</option>
-                            </select>
                         </div>
 
                         <!-- CAMPO DE SOLO FECHA DE VENTA -->
@@ -227,12 +219,12 @@
                     </div>
                     <div id="resumen-calculos" class="border-t border-gray-200 pt-4 mb-5 space-y-2 text-sm">
                         <div class="flex justify-between items-center text-lg font-bold">
-                            <span class="text-gray-800">Total a Pagar:</span>
+                            <span class="text-gray-800">Total a Pagar (Añadido a la Deuda):</span>
                             <span id="carrito-total" class="text-brand-red text-xl">S/ 0.00</span>
                         </div>
                     </div>
                     <button onclick="finalizarVenta()" class="w-full bg-brand-red hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check-circle"></i> Completar y Registrar Venta
+                        <i class="fa-solid fa-check-circle"></i> Completar y Registrar Venta a Crédito
                     </button>
                 </div>
             </section>
@@ -341,7 +333,6 @@
             cargarDashboard();
         }
 
-        // Función auxiliar para obtener solo la fecha actual en formato YYYY-MM-DD
         function obtenerFechaActual() {
             const ahora = new Date();
             const anio = ahora.getFullYear();
@@ -363,7 +354,6 @@
             if(tab === 'dashboard') cargarDashboard();
             if(tab === 'ventas') {
                 precargarCacheClientes();
-                // Settear fecha actual por defecto en el input de ventas
                 document.getElementById('venta-fecha').value = obtenerFechaActual();
             }
             if(tab === 'clientes') cargarClientes();
@@ -393,7 +383,6 @@
             }
         }
 
-        // --- SISTEMA DE BÚSQUEDA DE CLIENTES MÓVIL ---
         async function precargarCacheClientes() {
             try {
                 const cliSnap = await getDocs(collection(db, "clientes"));
@@ -422,10 +411,10 @@
 
         function renderizarSugerenciasClientes(clientes) {
             const contenedor = document.getElementById('lista-sugerencias-clientes');
-            let html = `<div onclick="seleccionarCliente('', 'Venta al contado (Anónimo)')" class="p-2.5 hover:bg-gray-100 cursor-pointer text-xs font-semibold text-gray-500 border-b">-- Venta al contado (Anónimo) --</div>`;
+            let html = '';
             
             if(clientes.length === 0) {
-                html += `<div class="p-3 text-xs text-gray-400 italic text-center">No se encontraron clientes</div>`;
+                html = `<div class="p-3 text-xs text-gray-400 italic text-center">No se encontraron clientes registrados</div>`;
             } else {
                 clientes.forEach(c => {
                     html += `<div onclick="seleccionarCliente('${c.id}', '${c.nombre}')" class="p-2.5 hover:bg-red-50 hover:text-brand-red cursor-pointer text-xs font-medium border-b border-gray-100 flex justify-between items-center">
@@ -463,7 +452,6 @@
                 sugerencias.classList.add('hidden');
             }
         });
-        // ---------------------------------------------
 
         window.agregarItemLibre = function() {
             const nombre = document.getElementById('item-nombre').value.trim();
@@ -631,21 +619,15 @@
 
                 let html = '<div class="space-y-3">';
                 movimientos.forEach(mov => {
-                    // Mostrar solo la fecha (YYYY-MM-DD) adaptada al formato local legible
                     const fechaParts = mov.fecha ? mov.fecha.split('-') : [];
                     const fechaFormateada = fechaParts.length === 3 ? `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}` : mov.fecha;
 
                     if(mov.tipo === 'venta') {
                         const v = mov.data;
-                        const tipoBadge = v.tipoPago === 'credito' ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-semibold">Crédito / Fiado</span>' : '<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded font-semibold">Contado</span>';
-                        
                         html += `<div class="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-2">
                             <div class="flex justify-between items-center text-xs text-gray-500 border-b pb-1.5">
-                                <span><i class="fa-solid fa-cart-shopping text-brand-red mr-1"><b>COMPRA:</b></i> ${fechaFormateada}</span>
-                                <div class="flex items-center gap-2">
-                                    ${tipoBadge}
-                                    <span class="font-bold text-brand-dark text-sm">Total: S/ ${v.total.toFixed(2)}</span>
-                                </div>
+                                <span><i class="fa-solid fa-cart-shopping text-brand-red mr-1"><b>CRÉDITO / FIADO:</b></i> ${fechaFormateada}</span>
+                                <span class="font-bold text-brand-dark text-sm">Total: S/ ${v.total.toFixed(2)}</span>
                             </div>
                             <div class="text-xs font-semibold text-gray-700 mt-1">Prendas / Artículos:</div>
                             <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">`;
@@ -657,7 +639,7 @@
                         html += `</ul>`;
                         
                         html += `<div class="text-right pt-2 border-t border-gray-200 mt-2">
-                            <button onclick="eliminarVenta('${mov.id}', '${clienteId}', ${v.total}, '${v.tipoPago}')" class="bg-red-50 hover:bg-red-100 text-brand-red text-xs px-3 py-1.5 rounded-lg font-semibold transition border border-red-200">
+                            <button onclick="eliminarVenta('${mov.id}', '${clienteId}', ${v.total})" class="bg-red-50 hover:bg-red-100 text-brand-red text-xs px-3 py-1.5 rounded-lg font-semibold transition border border-red-200">
                                 <i class="fa-solid fa-trash mr-1"></i> Eliminar esta Venta
                             </button>
                         </div>`;
@@ -693,18 +675,16 @@
             document.getElementById('modal-historial').classList.add('hidden');
         }
 
-        window.eliminarVenta = async function(ventaId, clienteId, totalVenta, tipoPago) {
-            if(!confirm("¿Estás segura de eliminar esta venta? Si fue a crédito, se restará de la deuda del cliente.")) return;
+        window.eliminarVenta = async function(ventaId, clienteId, totalVenta) {
+            if(!confirm("¿Estás segura de eliminar esta venta? Se restará de la deuda del cliente.")) return;
 
             try {
-                if(tipoPago === 'credito' && clienteId && clienteId !== 'anonimo') {
-                    const cliRef = doc(db, "clientes", clienteId);
-                    const cliSnap = await getDoc(cliRef);
-                    if(cliSnap.exists()) {
-                        const deudaActual = cliSnap.data().deudaTotal || 0;
-                        const nuevaDeuda = Math.max(0, deudaActual - totalVenta);
-                        await updateDoc(cliRef, { deudaTotal: nuevaDeuda });
-                    }
+                const cliRef = doc(db, "clientes", clienteId);
+                const cliSnap = await getDoc(cliRef);
+                if(cliSnap.exists()) {
+                    const deudaActual = cliSnap.data().deudaTotal || 0;
+                    const nuevaDeuda = Math.max(0, deudaActual - totalVenta);
+                    await updateDoc(cliRef, { deudaTotal: nuevaDeuda });
                 }
 
                 await deleteDoc(doc(db, "ventas", ventaId));
@@ -742,7 +722,6 @@
             }
         }
 
-        // Diálogo de abono con selector de SOLO fecha
         window.registrarAbonoModal = async function(clienteId, deudaActual) {
             const fechaHoy = obtenerFechaActual();
             
@@ -784,37 +763,33 @@
             }
 
             const clienteId = document.getElementById('venta-cliente-id').value;
-            const tipoPago = document.getElementById('venta-tipo').value;
             const fechaFinal = document.getElementById('venta-fecha').value || obtenerFechaActual();
 
-            if(tipoPago === 'credito' && !clienteId) {
-                alert("Para registrar una venta a crédito / fiado, debes seleccionar obligatoriamente un cliente usando el buscador.");
+            if(!clienteId) {
+                alert("Debes seleccionar obligatoriamente un cliente usando el buscador para registrar la venta al crédito.");
                 return;
             }
 
             let total = carritoLibre.reduce((acc, item) => acc + item.precio, 0);
 
             try {
-                if(tipoPago === 'credito' && clienteId) {
-                    const clienteRef = doc(db, "clientes", clienteId);
-                    const cliSnap = await getDoc(clienteRef);
-                    if(cliSnap.exists()) {
-                        const deudaActual = cliSnap.data().deudaTotal || 0;
-                        await updateDoc(clienteRef, { deudaTotal: deudaActual + total });
-                    }
+                const clienteRef = doc(db, "clientes", clienteId);
+                const cliSnap = await getDoc(clienteRef);
+                if(cliSnap.exists()) {
+                    const deudaActual = cliSnap.data().deudaTotal || 0;
+                    await updateDoc(clienteRef, { deudaTotal: deudaActual + total });
                 }
 
                 await addDoc(collection(db, "ventas"), {
-                    clienteId: clienteId || 'anonimo',
-                    tipoPago,
+                    clienteId: clienteId,
+                    tipoPago: 'credito',
                     items: carritoLibre,
                     total,
                     fecha: fechaFinal
                 });
 
-                alert("¡Venta registrada con éxito!");
+                alert("¡Venta a crédito registrada con éxito!");
                 carritoLibre = [];
-                document.getElementById('venta-tipo').value = 'contado';
                 document.getElementById('venta-fecha').value = obtenerFechaActual();
                 quitarClienteSeleccionado();
                 actualizarVistaCarrito();
