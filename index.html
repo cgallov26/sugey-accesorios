@@ -25,10 +25,16 @@
         }
     </script>
 </head>
-<body class="bg-brand-light text-brand-dark antialiased">
+<body class="bg-brand-light text-brand-dark antialiased relative">
+
+    <!-- OVERLAY DE CARGA / BLOQUEO -->
+    <div id="overlay-carga" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex flex-col items-center justify-center space-y-4">
+        <div class="w-16 h-16 border-4 border-brand-red border-t-transparent rounded-full animate-spin"></div>
+        <p id="texto-carga" class="text-white font-bold text-base tracking-wide">Guardando en Firebase, por favor espera...</p>
+    </div>
 
     <!-- PANTALLA DE LOGIN -->
-    <div id="pantalla-login" class="fixed inset-0 bg-brand-dark flex items-center justify-center p-4 z-50">
+    <div id="pantalla-login" class="fixed inset-0 bg-brand-dark flex items-center justify-center p-4 z-40">
         <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center space-y-6 border-t-8 border-brand-red">
             <div class="w-20 h-20 rounded-full bg-white mx-auto flex items-center justify-center overflow-hidden border-2 border-brand-red shadow-md">
                 <img src="image_93adc6.png" alt="Logo Sugey Accesorios & Más" class="w-full h-full object-cover">
@@ -258,7 +264,7 @@
         </main>
 
         <!-- MODAL HISTORIAL DE COMPRAS Y ABONOS -->
-        <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-40">
             <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4 border-b pb-3">
                     <h3 id="historial-titulo" class="text-lg font-bold text-brand-dark">Historial de Movimientos</h3>
@@ -299,6 +305,15 @@
         let clienteActualModalNombre = '';
         let listaClientesCache = []; 
         let listaClientesGeneralCache = []; 
+
+        function mostrarCarga(mensaje = "Guardando en Firebase, por favor espera...") {
+            document.getElementById('texto-carga').innerText = mensaje;
+            document.getElementById('overlay-carga').classList.remove('hidden');
+        }
+
+        function ocultarCarga() {
+            document.getElementById('overlay-carga').classList.add('hidden');
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             if(sessionStorage.getItem('sugey_sesion_activa') === 'true') {
@@ -515,14 +530,17 @@
                 return;
             }
 
+            mostrarCarga("Guardando cliente...");
             try {
                 await addDoc(collection(db, "clientes"), { nombre, telefono, deudaTotal: 0 });
+                ocultarCarga();
                 alert("¡Cliente registrado con éxito!");
                 document.getElementById('cli-nombre').value = '';
                 document.getElementById('cli-telefono').value = '';
                 cargarClientes();
                 precargarCacheClientes();
             } catch (e) {
+                ocultarCarga();
                 console.error("Error al guardar cliente: ", e);
                 alert("Error al guardar cliente.");
             }
@@ -678,6 +696,7 @@
         window.eliminarVenta = async function(ventaId, clienteId, totalVenta) {
             if(!confirm("¿Estás segura de eliminar esta venta? Se restará de la deuda del cliente.")) return;
 
+            mostrarCarga("Eliminando venta...");
             try {
                 const cliRef = doc(db, "clientes", clienteId);
                 const cliSnap = await getDoc(cliRef);
@@ -688,12 +707,14 @@
                 }
 
                 await deleteDoc(doc(db, "ventas", ventaId));
+                ocultarCarga();
                 alert("Venta eliminada correctamente.");
                 
                 verHistorialCliente(clienteActualModalId, clienteActualModalNombre);
                 cargarDashboard();
                 cargarClientes();
             } catch(e) {
+                ocultarCarga();
                 console.error("Error al eliminar venta:", e);
                 alert("Hubo un error al eliminar la venta.");
             }
@@ -702,6 +723,7 @@
         window.eliminarAbono = async function(abonoId, clienteId, montoAbono) {
             if(!confirm("¿Estás segura de eliminar este abono? El monto se volverá a sumar a la deuda del cliente.")) return;
 
+            mostrarCarga("Eliminando abono...");
             try {
                 const cliRef = doc(db, "clientes", clienteId);
                 const cliSnap = await getDoc(cliRef);
@@ -711,12 +733,14 @@
                 }
 
                 await deleteDoc(doc(db, "abonos", abonoId));
+                ocultarCarga();
                 alert("Abono eliminado correctamente.");
 
                 verHistorialCliente(clienteActualModalId, clienteActualModalNombre);
                 cargarDashboard();
                 cargarClientes();
             } catch(e) {
+                ocultarCarga();
                 console.error("Error al eliminar abono:", e);
                 alert("Hubo un error al eliminar el abono.");
             }
@@ -737,6 +761,7 @@
             const fechaStr = prompt("Confirme o modifique la fecha del abono (Formato: AAAA-MM-DD):", fechaHoy);
             let fechaFinal = fechaStr ? fechaStr.trim() : fechaHoy;
 
+            mostrarCarga("Registrando abono...");
             try {
                 const clienteRef = doc(db, "clientes", clienteId);
                 const nuevaDeuda = Math.max(0, deudaActual - abono);
@@ -748,9 +773,11 @@
                     fecha: fechaFinal
                 });
 
+                ocultarCarga();
                 alert(`¡Abono registrado con éxito! Deuda restante: S/ ${nuevaDeuda.toFixed(2)}`);
                 cargarClientes();
             } catch(e) {
+                ocultarCarga();
                 console.error("Error al abonar:", e);
                 alert("Error al actualizar la deuda.");
             }
@@ -772,6 +799,7 @@
 
             let total = carritoLibre.reduce((acc, item) => acc + item.precio, 0);
 
+            mostrarCarga("Registrando venta a crédito...");
             try {
                 const clienteRef = doc(db, "clientes", clienteId);
                 const cliSnap = await getDoc(clienteRef);
@@ -788,12 +816,14 @@
                     fecha: fechaFinal
                 });
 
+                ocultarCarga();
                 alert("¡Venta a crédito registrada con éxito!");
                 carritoLibre = [];
                 document.getElementById('venta-fecha').value = obtenerFechaActual();
                 quitarClienteSeleccionado();
                 actualizarVistaCarrito();
             } catch(e) {
+                ocultarCarga();
                 console.error("Error al registrar venta:", e);
                 alert("Hubo un error al registrar la venta.");
             }
